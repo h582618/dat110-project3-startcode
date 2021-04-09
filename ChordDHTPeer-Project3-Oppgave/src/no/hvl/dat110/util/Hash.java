@@ -6,17 +6,20 @@ package no.hvl.dat110.util;
  *
  */
 
+import no.hvl.dat110.middleware.Message;
+
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+
 public class Hash { 
 	
 	private static BigInteger hashint; 
 	
-	public static BigInteger hashOf(String entity) {		
+	public static BigInteger hashOf(String entity) {
 		
 		// Task: Hash a given string using MD5 and return the result as a BigInteger.
 		
@@ -29,32 +32,46 @@ public class Hash {
 		// convert the hex into BigInteger
 		
 		// return the BigInteger
-		
+
+		try {
+			byte[] bytesOfMessage = entity.getBytes("UTF-8");
+			MessageDigest md5 = MessageDigest.getInstance("MD5");
+			byte[] entityString = md5.digest(bytesOfMessage);
+
+			String myHex = toHex(entityString);
+
+			hashint = new BigInteger(myHex, 16);
+		} catch (Exception e){
+			System.out.println(e);
+		}
+
+
 		return hashint;
 	}
+
 	
 	public static BigInteger addressSize() {
-		
-		// Task: compute the address size of MD5
-		
-		// get the digest length
-		
-		// compute the number of bits = digest length * 8
-		
-		// compute the address size = 2 ^ number of bits
-		
-		// return the address size
-		
-		return null;
+
+		int bits = bitSize();
+		BigInteger exp = new BigInteger("2");
+		exp = exp.pow(bits);
+		return exp;
 	}
 	
 	public static int bitSize() {
-		
+
 		int digestlen = 0;
-		
+
 		// find the digest length
-		
-		return digestlen*8;
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("MD5");
+			digestlen = md.getDigestLength();
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+
+		return digestlen * 8;
 	}
 	
 	public static String toHex(byte[] digest) {
